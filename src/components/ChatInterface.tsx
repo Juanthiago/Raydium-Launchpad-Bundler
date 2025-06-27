@@ -25,6 +25,7 @@ import {
 import { CreateTaskModal } from "./CreateTaskModal";
 import { CreateDocumentModal } from "./CreateDocumentModal";
 
+// Interface que define a estrutura de uma mensagem
 interface Message {
   id: string;
   content: string;
@@ -35,6 +36,7 @@ interface Message {
   mentions?: string[];
 }
 
+// Props que o componente recebe
 interface ChatInterfaceProps {
   conversation?: {
     id: string;
@@ -46,6 +48,7 @@ interface ChatInterfaceProps {
   } | null;
 }
 
+// Mensagens mockadas (em produção viriam de uma API)
 const messages: Message[] = [
   {
     id: '1',
@@ -80,12 +83,14 @@ const messages: Message[] = [
 ];
 
 export function ChatInterface({ conversation }: ChatInterfaceProps) {
+  // Estados para controlar a interface
   const [newMessage, setNewMessage] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showInternalMessages, setShowInternalMessages] = useState(true);
 
+  // Função para enviar nova mensagem
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       console.log('Sending message:', newMessage);
@@ -93,6 +98,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
     }
   };
 
+  // Função para lidar com ações em mensagens (criar tarefa ou documento)
   const handleMessageAction = (messageId: string, action: 'task' | 'document') => {
     const message = messages.find(m => m.id === messageId);
     setSelectedMessage(message || null);
@@ -103,6 +109,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
     }
   };
 
+  // Se não há conversa selecionada, mostra tela vazia
   if (!conversation) {
     return (
       <div className="flex-1 flex items-center justify-center bg-muted/20">
@@ -119,13 +126,14 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
     );
   }
 
+  // Filtra mensagens baseado na opção de mostrar mensagens internas
   const filteredMessages = showInternalMessages 
     ? messages 
     : messages.filter(m => !m.isInternal);
 
   return (
     <div className="flex-1 flex flex-col chat-container">
-      {/* Header */}
+      {/* Cabeçalho do chat com informações do cliente */}
       <div className="p-4 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -146,7 +154,9 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
             </div>
           </div>
           
+          {/* Controles do cabeçalho */}
           <div className="flex items-center space-x-2">
+            {/* Botão para alternar exibição de mensagens internas */}
             <Button
               variant={showInternalMessages ? "default" : "outline"}
               size="sm"
@@ -158,6 +168,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
               <User className="h-4 w-4 mr-1" />
               {conversation.assignedTo}
             </Button>
+            {/* Menu de opções adicionais */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -174,7 +185,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Área de mensagens */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {filteredMessages.map((message) => (
           <div
@@ -182,6 +193,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
             className={`flex ${message.sender === 'agent' ? 'justify-end' : 'justify-start'} group`}
           >
             <div className="flex space-x-2 max-w-[70%]">
+              {/* Avatar para mensagens que não são do agente */}
               {message.sender !== 'agent' && (
                 <Avatar className="h-8 w-8 mt-1">
                   <AvatarFallback className={
@@ -195,6 +207,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
               )}
               
               <div className="space-y-1">
+                {/* Bolha da mensagem */}
                 <div className={`message-bubble ${
                   message.sender === 'agent' 
                     ? 'message-sent' 
@@ -202,6 +215,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
                       ? 'bg-purple-50 border border-purple-200'
                       : 'message-received'
                 }`}>
+                  {/* Indicador para mensagens internas */}
                   {message.isInternal && (
                     <div className="text-xs text-purple-600 font-medium mb-1">
                       Mensagem interna
@@ -210,13 +224,14 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
                   <p className="text-sm">{message.content}</p>
                 </div>
                 
+                {/* Informações da mensagem e botões de ação */}
                 <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                   <span>{message.senderName}</span>
                   <span>•</span>
                   <span>{message.timestamp}</span>
                   <Clock className="h-3 w-3" />
                   
-                  {/* Action buttons */}
+                  {/* Botões de ação que aparecem no hover */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex space-x-1 ml-2">
                     <Button
                       size="sm"
@@ -242,7 +257,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
         ))}
       </div>
 
-      {/* Input */}
+      {/* Área de input para nova mensagem */}
       <div className="p-4 border-t border-border bg-card">
         <div className="flex items-end space-x-2">
           <Button variant="ghost" size="icon">
@@ -266,7 +281,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Modais para criar tarefa e documento */}
       <CreateTaskModal
         open={showTaskModal}
         onOpenChange={setShowTaskModal}

@@ -17,6 +17,7 @@ import { CalendarIcon, CheckSquare } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+// Interface para definir a estrutura de uma mensagem
 interface Message {
   id: string;
   content: string;
@@ -27,14 +28,16 @@ interface Message {
   mentions?: string[];
 }
 
+// Props que o componente recebe
 interface CreateTaskModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedMessage: Message | null;
+  selectedMessage: Message | null; // Mensagem selecionada para criar tarefa
   conversationId: string;
 }
 
 export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversationId }: CreateTaskModalProps) {
+  // Estado que armazena todos os dados da tarefa
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
@@ -46,6 +49,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
     createdDate: new Date(),
   });
 
+  // Effect que preenche automaticamente os campos quando uma mensagem é selecionada
   useEffect(() => {
     if (selectedMessage && open) {
       // Preenche automaticamente com dados da mensagem
@@ -59,6 +63,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
     }
   }, [selectedMessage, open]);
 
+  // Função para submeter o formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Creating task:', {
@@ -67,7 +72,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
       conversationId
     });
     
-    // Reset form
+    // Reset do formulário após criação
     setTaskData({
       title: '',
       description: '',
@@ -82,6 +87,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
     onOpenChange(false);
   };
 
+  // Função para fechar o modal e resetar formulário
   const handleClose = () => {
     // Reset form quando fechar
     setTaskData({
@@ -108,6 +114,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Seção que mostra a mensagem original quando uma mensagem foi selecionada */}
           {selectedMessage && (
             <div className="bg-muted/50 p-3 rounded-lg border">
               <div className="text-sm font-medium text-muted-foreground mb-1">
@@ -122,6 +129,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             </div>
           )}
 
+          {/* Campo obrigatório: Título da tarefa */}
           <div className="space-y-2">
             <Label htmlFor="title">Título da Tarefa *</Label>
             <Input
@@ -133,6 +141,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             />
           </div>
 
+          {/* Campo de descrição */}
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
             <Textarea
@@ -144,6 +153,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             />
           </div>
 
+          {/* Linha com dois campos: Relator e Data de Criação */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="reporter">Relator</Label>
@@ -152,7 +162,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
                 value={taskData.reporter}
                 onChange={(e) => setTaskData(prev => ({ ...prev, reporter: e.target.value }))}
                 placeholder="Nome do relator"
-                readOnly={!!selectedMessage}
+                readOnly={!!selectedMessage} // Só leitura se vier de uma mensagem
                 className={selectedMessage ? "bg-muted" : ""}
               />
             </div>
@@ -167,6 +177,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             </div>
           </div>
 
+          {/* Linha com Prioridade e Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Prioridade</Label>
@@ -175,6 +186,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
                   <SelectValue placeholder="Selecionar..." />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Opções de prioridade com indicadores visuais */}
                   <SelectItem value="low">
                     <div className="flex items-center space-x-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full" />
@@ -212,6 +224,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             </div>
           </div>
 
+          {/* Linha com Responsável e Data de Vencimento */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Responsável</Label>
@@ -220,6 +233,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
                   <SelectValue placeholder="Selecionar..." />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Lista de possíveis responsáveis */}
                   <SelectItem value="joao">João Silva</SelectItem>
                   <SelectItem value="ana">Ana Costa</SelectItem>
                   <SelectItem value="pedro">Pedro Reis</SelectItem>
@@ -230,6 +244,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
 
             <div className="space-y-2">
               <Label>Data de Vencimento</Label>
+              {/* Popover com calendário para seleção de data */}
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -256,6 +271,7 @@ export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversat
             </div>
           </div>
 
+          {/* Botões de ação */}
           <div className="flex justify-end space-x-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar

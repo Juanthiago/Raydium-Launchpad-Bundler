@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
+// Configuração das rotas de navegação - cada item tem título, URL, ícone e contador
 const navigation = [
   { title: "Conversas", url: "/", icon: MessageSquare, count: 12 },
   { title: "Tarefas", url: "/tasks", icon: CheckSquare, count: 8 },
@@ -35,21 +36,24 @@ const navigation = [
 ];
 
 export function AppSidebar() {
-  const location = useLocation();
-  const [userStatus, setUserStatus] = useState<'online' | 'away' | 'busy'>('online');
+  const location = useLocation(); // Hook para saber em qual rota estamos
+  const [userStatus, setUserStatus] = useState<'online' | 'away' | 'busy'>('online'); // Status do usuário
 
+  // Função para verificar se uma rota está ativa
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
 
+  // Função para aplicar classes CSS baseado na rota ativa
   const getNavCls = (path: string) =>
     isActive(path) 
-      ? "bg-primary/10 text-primary font-medium border-r-2 border-primary" 
-      : "hover:bg-accent/50 text-muted-foreground hover:text-foreground";
+      ? "bg-primary/10 text-primary font-medium border-r-2 border-primary" // Estilo para rota ativa
+      : "hover:bg-accent/50 text-muted-foreground hover:text-foreground"; // Estilo para rota inativa
 
   return (
     <Sidebar className="border-r border-border">
+      {/* Cabeçalho da sidebar com logo e título */}
       <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
@@ -62,7 +66,9 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
+      {/* Conteúdo principal da sidebar */}
       <SidebarContent className="px-2">
+        {/* Campo de busca */}
         <div className="p-2 mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -73,18 +79,21 @@ export function AppSidebar() {
           </div>
         </div>
 
+        {/* Menu de navegação */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
             Navegação
           </SidebarGroupLabel>
           <SidebarGroupContent className="space-y-1">
             <SidebarMenu>
+              {/* Mapeia cada item de navegação */}
               {navigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="h-10">
                     <NavLink to={item.url} className={getNavCls(item.url)}>
                       <item.icon className="h-4 w-4" />
                       <span className="flex-1">{item.title}</span>
+                      {/* Badge com contador se existir */}
                       {item.count && (
                         <Badge variant="secondary" className="h-5 text-xs">
                           {item.count}
@@ -99,6 +108,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
+      {/* Rodapé com informações do usuário */}
       <SidebarFooter className="p-4 border-t border-border">
         <div className="flex items-center space-x-3">
           <div className="relative">
@@ -108,6 +118,7 @@ export function AppSidebar() {
                 JD
               </AvatarFallback>
             </Avatar>
+            {/* Indicador de status do usuário */}
             <div className={`absolute -bottom-0.5 -right-0.5 status-indicator status-${userStatus}`} />
           </div>
           <div className="flex-1 min-w-0">

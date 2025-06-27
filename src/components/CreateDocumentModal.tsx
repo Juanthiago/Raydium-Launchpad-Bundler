@@ -13,14 +13,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText } from "lucide-react";
 
+// Props que o componente recebe
 interface CreateDocumentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  messageId: string | null;
-  conversationId: string;
+  messageId: string | null; // ID da mensagem que originou o documento
+  conversationId: string; // ID da conversa
 }
 
 export function CreateDocumentModal({ open, onOpenChange, messageId, conversationId }: CreateDocumentModalProps) {
+  // Estado que armazena os dados do documento
   const [documentData, setDocumentData] = useState({
     title: '',
     type: '',
@@ -29,11 +31,12 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
     tags: '',
   });
 
+  // Função para submeter o formulário
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Creating document:', documentData, 'for message:', messageId, 'conversation:', conversationId);
     
-    // Reset form
+    // Reset do formulário após criação
     setDocumentData({
       title: '',
       type: '',
@@ -56,6 +59,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Campo obrigatório: Título do documento */}
           <div className="space-y-2">
             <Label htmlFor="doc-title">Título do Documento *</Label>
             <Input
@@ -67,6 +71,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
             />
           </div>
 
+          {/* Linha com Tipo e Categoria */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Tipo de Documento</Label>
@@ -75,6 +80,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
                   <SelectValue placeholder="Selecionar..." />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Diferentes tipos de documento */}
                   <SelectItem value="report">Relatório</SelectItem>
                   <SelectItem value="meeting">Ata de Reunião</SelectItem>
                   <SelectItem value="observation">Observação</SelectItem>
@@ -91,6 +97,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
                   <SelectValue placeholder="Selecionar..." />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Categorias para organização */}
                   <SelectItem value="customer-service">Atendimento ao Cliente</SelectItem>
                   <SelectItem value="technical">Técnico</SelectItem>
                   <SelectItem value="sales">Comercial</SelectItem>
@@ -101,6 +108,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
             </div>
           </div>
 
+          {/* Campo obrigatório: Conteúdo do documento */}
           <div className="space-y-2">
             <Label htmlFor="content">Conteúdo *</Label>
             <Textarea
@@ -113,6 +121,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
             />
           </div>
 
+          {/* Campo de tags para facilitar busca */}
           <div className="space-y-2">
             <Label htmlFor="tags">Tags</Label>
             <Input
@@ -126,6 +135,7 @@ export function CreateDocumentModal({ open, onOpenChange, messageId, conversatio
             </p>
           </div>
 
+          {/* Botões de ação */}
           <div className="flex justify-end space-x-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar

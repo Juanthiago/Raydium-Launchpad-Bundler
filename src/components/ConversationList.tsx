@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, MessageSquare, Clock, CheckCircle, AlertCircle } from "lucide-react";
 
+// Interface que define a estrutura de uma conversa
 interface Conversation {
   id: string;
   customerName: string;
@@ -21,6 +22,7 @@ interface Conversation {
   avatar?: string;
 }
 
+// Dados mockados das conversas (em produção viriam de uma API)
 const conversations: Conversation[] = [
   {
     id: '1',
@@ -68,6 +70,7 @@ const conversations: Conversation[] = [
   }
 ];
 
+// Configuração dos status com suas respectivas cores e ícones
 const statusConfig = {
   open: { label: 'Aberto', icon: MessageSquare, color: 'bg-blue-500' },
   waiting: { label: 'Aguardando', icon: Clock, color: 'bg-yellow-500' },
@@ -75,22 +78,26 @@ const statusConfig = {
   internal: { label: 'Interno', icon: AlertCircle, color: 'bg-purple-500' }
 };
 
+// Configuração dos times com suas cores
 const teamConfig = {
   support: { label: 'Suporte', color: 'bg-blue-100 text-blue-800' },
   sales: { label: 'Comercial', color: 'bg-green-100 text-green-800' },
   technical: { label: 'Técnico', color: 'bg-purple-100 text-purple-800' }
 };
 
+// Props que o componente recebe do componente pai
 interface ConversationListProps {
   onSelectConversation: (conversation: Conversation) => void;
   selectedConversationId?: string;
 }
 
 export function ConversationList({ onSelectConversation, selectedConversationId }: ConversationListProps) {
+  // Estados para controlar filtros e busca
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
+  // Função que filtra as conversas baseado nos critérios selecionados
   const filteredConversations = conversations.filter(conv => {
     const matchesSearch = conv.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          conv.lastMessage.toLowerCase().includes(searchTerm.toLowerCase());
@@ -100,6 +107,7 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
     return matchesSearch && matchesTeam && matchesStatus;
   });
 
+  // Função que conta quantas conversas existem por status
   const getStatusCounts = () => {
     return {
       all: conversations.length,
@@ -114,16 +122,19 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
 
   return (
     <div className="w-80 border-r border-border bg-card flex flex-col">
+      {/* Cabeçalho da lista de conversas */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Conversas</h2>
           <Button size="sm" className="h-8">
             <MessageSquare className="h-4 w-4 mr-1" />
-            Nova
+            Nova {/* Botão para criar nova conversa */}
           </Button>
         </div>
         
+        {/* Área de filtros e busca */}
         <div className="space-y-3">
+          {/* Campo de busca */}
           <div className="relative">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
@@ -134,6 +145,7 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
             />
           </div>
           
+          {/* Filtros por time */}
           <div className="flex space-x-2">
             <Select value={selectedTeam} onValueChange={setSelectedTeam}>
               <SelectTrigger className="flex-1">
@@ -154,6 +166,7 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
         </div>
       </div>
 
+      {/* Abas para filtrar por status */}
       <Tabs value={selectedStatus} onValueChange={setSelectedStatus} className="flex-1 flex flex-col">
         <TabsList className="grid grid-cols-3 m-4 mb-0">
           <TabsTrigger value="all" className="text-xs">
@@ -167,6 +180,7 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
           </TabsTrigger>
         </TabsList>
 
+        {/* Lista de conversas */}
         <div className="flex-1 overflow-y-auto">
           <div className="space-y-1 p-2">
             {filteredConversations.map((conversation) => {
@@ -177,12 +191,13 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
               return (
                 <div
                   key={conversation.id}
-                  onClick={() => onSelectConversation(conversation)}
+                  onClick={() => onSelectConversation(conversation)} // Chama função quando clica na conversa
                   className={`p-3 rounded-lg cursor-pointer transition-all hover:bg-accent/50 ${
                     isSelected ? 'bg-primary/10 border border-primary/30' : 'bg-background'
                   }`}
                 >
                   <div className="flex items-start space-x-3">
+                    {/* Avatar do cliente com indicador de status */}
                     <div className="relative">
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={conversation.avatar} />
@@ -193,6 +208,7 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
                       <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full ${status.color}`} />
                     </div>
                     
+                    {/* Informações da conversa */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="font-medium truncate text-sm">
@@ -208,10 +224,12 @@ export function ConversationList({ onSelectConversation, selectedConversationId 
                       </p>
                       
                       <div className="flex items-center justify-between">
+                        {/* Badge do time */}
                         <Badge variant="outline" className={`text-xs ${team.color}`}>
                           {team.label}
                         </Badge>
                         
+                        {/* Contador de mensagens não lidas */}
                         {conversation.unreadCount > 0 && (
                           <Badge className="h-5 min-w-5 text-xs bg-primary">
                             {conversation.unreadCount}
