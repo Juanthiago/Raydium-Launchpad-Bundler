@@ -1,14 +1,34 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import { useState } from "react";
+import { ConversationList } from "@/components/ConversationList";
+import { ChatInterface } from "@/components/ChatInterface";
+
+interface Conversation {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  lastMessage: string;
+  timestamp: string;
+  status: string;
+  unreadCount: number;
+  assignedTo: string;
+  team: string;
+}
+
+export default function Index() {
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="flex h-screen">
+      <ConversationList 
+        onSelectConversation={handleSelectConversation}
+        selectedConversationId={selectedConversation?.id}
+      />
+      <ChatInterface conversation={selectedConversation} />
     </div>
   );
-};
-
-export default Index;
+}
