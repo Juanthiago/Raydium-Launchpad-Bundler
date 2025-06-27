@@ -83,7 +83,7 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
   const [newMessage, setNewMessage] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showDocumentModal, setShowDocumentModal] = useState(false);
-  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showInternalMessages, setShowInternalMessages] = useState(true);
 
   const handleSendMessage = () => {
@@ -94,7 +94,8 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
   };
 
   const handleMessageAction = (messageId: string, action: 'task' | 'document') => {
-    setSelectedMessageId(messageId);
+    const message = messages.find(m => m.id === messageId);
+    setSelectedMessage(message || null);
     if (action === 'task') {
       setShowTaskModal(true);
     } else {
@@ -269,14 +270,14 @@ export function ChatInterface({ conversation }: ChatInterfaceProps) {
       <CreateTaskModal
         open={showTaskModal}
         onOpenChange={setShowTaskModal}
-        messageId={selectedMessageId}
+        selectedMessage={selectedMessage}
         conversationId={conversation.id}
       />
       
       <CreateDocumentModal
         open={showDocumentModal}
         onOpenChange={setShowDocumentModal}
-        messageId={selectedMessageId}
+        messageId={selectedMessage?.id || null}
         conversationId={conversation.id}
       />
     </div>

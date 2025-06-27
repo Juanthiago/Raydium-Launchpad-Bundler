@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,14 +17,24 @@ import { CalendarIcon, CheckSquare } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+interface Message {
+  id: string;
+  content: string;
+  timestamp: string;
+  sender: 'customer' | 'agent' | 'internal';
+  senderName: string;
+  isInternal?: boolean;
+  mentions?: string[];
+}
+
 interface CreateTaskModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  messageId: string | null;
+  selectedMessage: Message | null;
   conversationId: string;
 }
 
-export function CreateTaskModal({ open, onOpenChange, messageId, conversationId }: CreateTaskModalProps) {
+export function CreateTaskModal({ open, onOpenChange, selectedMessage, conversationId }: CreateTaskModalProps) {
   const [taskData, setTaskData] = useState({
     title: '',
     description: '',
@@ -32,11 +42,30 @@ export function CreateTaskModal({ open, onOpenChange, messageId, conversationId 
     assignee: '',
     team: '',
     dueDate: undefined as Date | undefined,
+    reporter: '',
+    createdDate: new Date(),
   });
+
+  useEffect(() => {
+    if (selectedMessage && open) {
+      // Preenche automaticamente com dados da mensagem
+      setTaskData(prev => ({
+        ...prev,
+        title: `Tarefa relacionada à mensagem de ${selectedMessage.senderName}`,
+        description: `Mensagem original: "${selectedMessage.content}"\n\nEnviada em: ${selectedMessage.timestamp}`,
+        reporter: selectedMessage.senderName,
+        createdDate: new Date(),
+      }));
+    }
+  }, [selectedMessage, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Creating task:', taskData, 'for message:', messageId, 'conversation:', conversationId);
+    console.log('Creating task:', {
+      ...taskData,
+      originalMessage: selectedMessage,
+      conversationId
+    });
     
     // Reset form
     setTaskData({
@@ -46,14 +75,31 @@ export function CreateTaskModal({ open, onOpenChange, messageId, conversationId 
       assignee: '',
       team: '',
       dueDate: undefined,
+      reporter: '',
+      createdDate: new Date(),
     });
     
     onOpenChange(false);
   };
 
+  const handleClose = () => {
+    // Reset form quando fechar
+    setTaskData({
+      title: '',
+      description: '',
+      priority: '',
+      assignee: '',
+      team: '',
+      dueDate: undefined,
+      reporter: '',
+      createdDate: new Date(),
+    });
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <CheckSquare className="h-5 w-5 text-primary" />
@@ -62,6 +108,20 @@ export function CreateTaskModal({ open, onOpenChange, messageId, conversationId 
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {selectedMessage && (
+            <div className="bg-muted/50 p-3 rounded-lg border">
+              <div className="text-sm font-medium text-muted-foreground mb-1">
+                Baseado na mensagem de {selectedMessage.senderName}
+              </div>
+              <div className="text-sm bg-background p-2 rounded border">
+                "{selectedMessage.content}"
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Enviada em: {selectedMessage.timestamp}
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="title">Título da Tarefa *</Label>
             <Input
@@ -80,8 +140,31 @@ export function CreateTaskModal({ open, onOpenChange, messageId, conversationId 
               placeholder="Descreva os detalhes da tarefa..."
               value={taskData.description}
               onChange={(e) => setTaskData(prev => ({ ...prev, description: e.target.value }))}
-              rows={3}
+              rows={4}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="reporter">Relator</Label>
+              <Input
+                id="reporter"
+                value={taskData.reporter}
+                onChange={(e) => setTaskData(prev => ({ ...prev, reporter: e.target.value }))}
+                placeholder="Nome do relator"
+                readOnly={!!selectedMessage}
+                className={selectedMessage ? "bg-muted" : ""}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Data de Criação</Label>
+              <Input
+                value={format(taskData.createdDate, "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                readOnly
+                className="bg-muted"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -174,7 +257,7 @@ export function CreateTaskModal({ open, onOpenChange, messageId, conversationId 
           </div>
 
           <div className="flex justify-end space-x-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
             <Button type="submit" disabled={!taskData.title.trim()}>
