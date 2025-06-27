@@ -13,7 +13,8 @@ import {
   CheckSquare,
   User,
   Clock,
-  Phone
+  Phone,
+  MessageSquare
 } from "lucide-react";
 import {
   DropdownMenu,
