@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import Tasks from "./pages/Tasks";
 import Documents from "./pages/Documents";
+import DocumentView from "./pages/DocumentView";
 import Bugs from "./pages/Bugs";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
                 <Route path="/" element={<Index />} /> {/* Página inicial - Conversas */}
                 <Route path="/tasks" element={<Tasks />} /> {/* Página de Tarefas */}
                 <Route path="/documents" element={<Documents />} /> {/* Página de Documentos */}
+                <Route path="/documents/:id" element={<DocumentView />} /> {/* Página individual do documento */}
                 <Route path="/bugs" element={<Bugs />} /> {/* Página de Bugs */}
                 <Route path="/settings" element={<Settings />} /> {/* Página de Configurações */}
                 <Route path="*" element={<NotFound />} /> {/* Página 404 */}

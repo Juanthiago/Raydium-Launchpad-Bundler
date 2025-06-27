@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,9 @@ import {
   User,
   Download,
   Filter,
-  Eye
+  Eye,
+  ExternalLink,
+  BookOpen
 } from "lucide-react";
 
 interface Document {
@@ -100,16 +102,22 @@ export default function Documents() {
     return matchesSearch && matchesCategory;
   });
 
+  // Componente Card atualizado com link para página individual
   const DocumentCard = ({ document }: { document: Document }) => {
     const type = typeConfig[document.type];
     const team = teamConfig[document.team];
 
     return (
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+      <Card className="hover:shadow-md transition-shadow group">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <CardTitle className="text-sm font-medium line-clamp-2 flex-1 mr-2">
-              {document.title}
+              <Link 
+                to={`/documents/${document.id}`}
+                className="hover:text-primary transition-colors"
+              >
+                {document.title}
+              </Link>
             </CardTitle>
             <Badge variant="outline" className={type.color}>
               {type.icon} {type.label}
@@ -118,7 +126,7 @@ export default function Documents() {
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
-            {document.content}
+            {document.content.substring(0, 150)}...
           </p>
           
           <div className="space-y-2">
@@ -140,11 +148,16 @@ export default function Documents() {
             )}
             
             <div className="flex flex-wrap gap-1 mt-2">
-              {document.tags.map(tag => (
+              {document.tags.slice(0, 3).map(tag => (
                 <Badge key={tag} variant="secondary" className="text-xs">
                   #{tag}
                 </Badge>
               ))}
+              {document.tags.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{document.tags.length - 3}
+                </Badge>
+              )}
             </div>
             
             <div className="flex items-center justify-between pt-3 border-t">
@@ -153,10 +166,12 @@ export default function Documents() {
               </Badge>
               
               <div className="flex space-x-1">
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                  <Eye className="h-3 w-3" />
-                </Button>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                <Link to={`/documents/${document.id}`}>
+                  <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <BookOpen className="h-3 w-3" />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Download className="h-3 w-3" />
                 </Button>
               </div>
@@ -171,11 +186,15 @@ export default function Documents() {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Header da página */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Documentos</h1>
+          <h1 className="text-2xl font-bold flex items-center">
+            <FileText className="h-6 w-6 mr-3 text-primary" />
+            Base de Conhecimento
+          </h1>
           <p className="text-muted-foreground">
-            Organize e acesse todos os documentos da equipe
+            Acesse toda a documentação e conhecimento da empresa
           </p>
         </div>
         <Button>
@@ -184,11 +203,78 @@ export default function Documents() {
         </Button>
       </div>
 
+      {/* Estatísticas rápidas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <FileText className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{documents.length}</p>
+                <p className="text-xs text-muted-foreground">Total de Documentos</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <BookOpen className="h-4 w-4 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{documents.filter(d => d.type === 'procedure').length}</p>
+                <p className="text-xs text-muted-foreground">Procedimentos</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <User className="h-4 w-4 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{Array.from(new Set(documents.map(d => d.author))).length}</p>
+                <p className="text-xs text-muted-foreground">Autores</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <Calendar className="h-4 w-4 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">
+                  {documents.filter(d => {
+                    const docDate = new Date(d.createdAt);
+                    const thisMonth = new Date();
+                    return docDate.getMonth() === thisMonth.getMonth() && 
+                           docDate.getFullYear() === thisMonth.getFullYear();
+                  }).length}
+                </p>
+                <p className="text-xs text-muted-foreground">Este Mês</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Barra de busca e filtros */}
       <div className="flex items-center space-x-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar documentos..."
+            placeholder="Buscar na base de conhecimento..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -200,6 +286,7 @@ export default function Documents() {
         </Button>
       </div>
 
+      {/* Tabs de categorias */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
         <TabsList className="grid grid-cols-2 lg:grid-cols-4 lg:w-fit">
           <TabsTrigger value="all">
