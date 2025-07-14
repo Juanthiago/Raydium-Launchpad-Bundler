@@ -1,9 +1,10 @@
-import SidebarBase from "@/components/Sidebar/index";
+import MainLayout from "@/components/Layout/MainLayout";
+import Welcome from "@/components/Dashboard/Welcome";
 
 export default function Home() {
   return (
-    <div className="flex-col">
-      <SidebarBase />
-    </div>
+    <MainLayout>
+      <Welcome />
+    </MainLayout>
   );
 }
