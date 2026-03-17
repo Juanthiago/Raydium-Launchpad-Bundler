@@ -1,36 +1,34 @@
 {
-  "name": "zuppo",
-  "version": "0.1.0",
-  "private": true,
+  "name": "raydium-launchpad-bundler",
+  "version": "1.0.0",
+  "description": "Solana Web3 trading bot for Raydium Launchlab with bundle buy and take profit",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "tsc --watch"
   },
+  "keywords": [
+    "solana",
+    "raydium",
+    "trading-bot",
+    "web3",
+    "jito",
+    "helius"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "@radix-ui/react-dialog": "^1.1.14",
-    "@radix-ui/react-separator": "^1.1.7",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@radix-ui/react-tooltip": "^1.2.7",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "lucide-react": "^0.525.0",
-    "next": "15.3.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.3.1"
+    "@solana/web3.js": "^1.87.6",
+    "@raydium-io/raydium-sdk": "^1.3.1-beta.58",
+    "bs58": "^5.0.0",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.3.5",
-    "tailwindcss": "^4",
-    "tw-animate-css": "^1.3.5",
-    "typescript": "^5"
+    "@types/node": "^20.10.5",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2"
   }
 }
